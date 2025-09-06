@@ -1,76 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>ESP32 LED Control</title>
   <style>
-    body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #1d3557, #457b9d);
-      color: white;
-    }
-
-    h1 {
-      margin: 30px 0 20px;
-      font-size: 2.2em;
-    }
-
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 70vh;
-    }
-
-    button {
-      padding: 15px 40px;
-      font-size: 18px;
-      margin: 12px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.3);
-    }
-
-    .on {
-      background: #06d6a0;
-      color: #fff;
-    }
-
-    .off {
-      background: #ef476f;
-      color: #fff;
-    }
-
-    .status {
-      margin-top: 25px;
-      padding: 12px 20px;
-      font-size: 18px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(5px);
-    }
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    h1 { color: #333; }
+    button { padding: 15px 30px; font-size: 18px; margin: 10px; border: none; border-radius: 10px; cursor: pointer; }
+    .on { background: green; color: white; }
+    .off { background: red; color: white; }
+    #status { margin-top: 20px; font-size: 20px; font-weight: bold; }
   </style>
 </head>
 <body>
   <h1>ESP32 LED Control</h1>
-  <div class="container">
-    <button class="on" onclick="toggleLED('on')">Turn ON</button>
-    <button class="off" onclick="toggleLED('off')">Turn OFF</button>
-    <div class="status" id="status">LED Status: Unknown</div>
-  </div>
+  <button class="on" onclick="setLED(true)">Turn ON</button>
+  <button class="off" onclick="setLED(false)">Turn OFF</button>
+  <p id="status">LED Status: Unknown</p>
 
-  <!-- Link external JS -->
-  <script src="script.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <script>
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAT0s6igCKQMLrxSzK8rLNEKlVnvWvk48k",
+      authDomain: "esp32-74a21.firebaseapp.com",
+      databaseURL: "https://esp32-74a21-default-rtdb.firebaseio.com",
+      projectId: "esp32-74a21",
+      storageBucket: "esp32-74a21.firebasestorage.app",
+      messagingSenderId: "53333747489",
+      appId: "1:53333747489:web:d025257a1d6522f0a0c060",
+      measurementId: "G-JZ06KLEL07"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Function to update LED state in Firebase
+    function setLED(state) {
+      db.ref("led_state").set(state ? "ON" : "OFF");
+    }
+
+    // Listen for changes in LED state
+    db.ref("led_state").on("value", snapshot => {
+      const status = snapshot.val();
+      document.getElementById("status").innerText = "LED Status: " + status;
+    });
+  </script>
 </body>
 </html>
